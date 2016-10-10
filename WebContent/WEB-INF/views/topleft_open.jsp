@@ -348,7 +348,7 @@ $("body").on("click","#usercenter,#usercenter2",function(){
 		</ul>
 	</div>
 </div>
-
+	
 	<script src="js/main.js"></script>
 	<!-- Resource jQuery -->
 </html>

@@ -15,7 +15,7 @@ import javax.websocket.server.ServerEndpoint;
 @ServerEndpoint("/updateServerStatus")
 public class ServerStatus {
 	private Session session;
-	private static CopyOnWriteArraySet<ServerStatus> serverStatus = new CopyOnWriteArraySet<ServerStatus>();
+	private static final CopyOnWriteArraySet<ServerStatus> serverStatus = new CopyOnWriteArraySet<ServerStatus>();
 
 	public ServerStatus() {
 	}
@@ -23,7 +23,7 @@ public class ServerStatus {
 	@OnOpen
 	public void onOpen(Session session) {
 		this.session = session;
-		ServerStatus.serverStatus.add(this);
+		serverStatus.add(this);
 		try {
 			Thread.sleep(500); // 睡眠2秒是因为网页跳转到main_log需要连接websocket 太快，获取不了数据
 		} catch (InterruptedException e1) {
@@ -38,10 +38,19 @@ public class ServerStatus {
 
 		for (ServerStatus ws : serverStatus) {
 			try {
-				ws.sendMessage(message);
+				synchronized (ws) {
+					ws.sendMessage(message);
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				serverStatus.remove(ws);
+				/*try {
+					ws.session.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}*/
 				continue;
 			}
 		}
@@ -53,7 +62,7 @@ public class ServerStatus {
 
 	@OnClose
 	public void onClose() {
-		ServerStatus.serverStatus.remove(this);
+		serverStatus.remove(this);
 		System.out.println("连接" + session.getId() + "关闭");
 
 	}
