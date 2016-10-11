@@ -217,10 +217,12 @@ label > div.radio {
 														<span class="input140 mr20">巡检类型：</span>
 														<select id="job_type" class="w85" style="width: 220px;" name="job_type"
 															onchange="change_type(this)">
-															<option value="WAS">WAS 巡检</option>
+															<!-- <option value="WAS">WAS 巡检</option>
 															<option value="MQ">MQ 巡检</option>
 															<option value="DB2">DB2 巡检</option>
-															<option value="OS">OS 巡检</option>
+															<option value="OS">OS 巡检</option> -->
+															<c:forEach var="pro" items="${proList}"><option value="${pro }">${pro }</option></c:forEach>
+															
 														</select>
 													</div>
 												</div>

@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE HTML>
 <html>
 <link rel="stylesheet" href="css/reset.css">
@@ -334,6 +335,7 @@ $("body").on("click","#usercenter,#usercenter2",function(){
 			<span id="menu16" style="position:relative;top:15px;font-size:13px;">用户中心</span>
 		</div>
 		
+		<c:if test="${role == 1 }">
 		<ul id="demo-list1">
 			<li>
 				<a href="accountManage.do" class="notvisible tooltipa1" data-toggle="tooltip" data-placement="right" title="账号管理">
@@ -346,6 +348,7 @@ $("body").on("click","#usercenter,#usercenter2",function(){
 			    </a>
 			</li>
 		</ul>
+		</c:if>
 	</div>
 </div>
 	
