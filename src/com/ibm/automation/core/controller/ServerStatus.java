@@ -9,6 +9,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.apache.log4j.Logger;
+
 /*
  * 这个类主要用于添加主机的时候更新table 中这行的状态
  */
@@ -16,7 +18,7 @@ import javax.websocket.server.ServerEndpoint;
 public class ServerStatus {
 	private Session session;
 	private static final CopyOnWriteArraySet<ServerStatus> serverStatus = new CopyOnWriteArraySet<ServerStatus>();
-
+	public static Logger logger = Logger.getLogger(ServerStatus.class);
 	public ServerStatus() {
 	}
 
@@ -35,7 +37,7 @@ public class ServerStatus {
 	@OnMessage
 	public void onMessage(String message, Session session) {
 		System.out.println("来自客户端" + session.getId() + "的消息" + message);
-
+		logger.info("来自客户端" + session.getId() + "的消息" + message);
 		for (ServerStatus ws : serverStatus) {
 			try {
 				synchronized (ws) {
@@ -44,6 +46,7 @@ public class ServerStatus {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				logger.info("来自客户端" + session.getId() + "的报错消息" + e.getMessage());
 				serverStatus.remove(ws);
 				/*try {
 					ws.session.close();
@@ -64,7 +67,7 @@ public class ServerStatus {
 	public void onClose() {
 		serverStatus.remove(this);
 		System.out.println("连接" + session.getId() + "关闭");
+		logger.info("来自客户端" + session.getId() + "关闭");
 
 	}
-
 }
