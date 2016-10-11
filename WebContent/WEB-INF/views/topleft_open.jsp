@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE HTML>
 <html>
 <link rel="stylesheet" href="css/reset.css">
@@ -101,6 +102,7 @@ jQuery(document).ready(function () {
 		   		 $("#menu14").show();
 		   		 $("#menu15").show();
 		   		 $("#menu17").show();	
+		   		 $("#menu18").show();	
 		   		 
 		   		 $("#showonce").delay(0).slideDown(300);
 		   		$("#forremoveminux").addClass("submenu-indicator-minus");
@@ -118,6 +120,7 @@ jQuery(document).ready(function () {
 			$("#menu15").hide();
 			$("#menu16").hide();
 			$("#menu17").hide();
+			$("#menu18").hide();
 		 	$("#jquery-accordion-menu").animate({width:"56px"},1,function(){
 			 	$(".nosubmenu").css("display","none");			//收缩后将三级菜单收起
 			 	$('.nosubmenu').find('.has-children.selected').removeClass('selected');	//将三级菜单还原到默认情况
@@ -151,6 +154,7 @@ jQuery(document).ready(function () {
 		 $("#menu14").show(300);
 		 $("#menu15").show(300);
 		 $("#menu17").show(300);
+		 $("#menu18").show(300);
 	});
 	//左侧菜单栏的隐藏和显示 结束
 });
@@ -334,6 +338,7 @@ $("body").on("click","#usercenter,#usercenter2",function(){
 			<span id="menu16" style="position:relative;top:15px;font-size:13px;">用户中心</span>
 		</div>
 		
+		<c:if test="${role == 1 }">
 		<ul id="demo-list1">
 			<li>
 				<a href="accountManage.do" class="notvisible tooltipa1" data-toggle="tooltip" data-placement="right" title="账号管理">
@@ -345,7 +350,17 @@ $("body").on("click","#usercenter,#usercenter2",function(){
 					<span id="menu17" class="top5">账号管理</span> 
 			    </a>
 			</li>
+			<li>
+				<a href="cenManage.do" class="notvisible tooltipa1" data-toggle="tooltip" data-placement="right" title="集中管理">
+					<img class="img_icon" src="img/icons/iconfont/cenManage.png" id="icon16"></img>
+				</a>
+				<a href="cenManage.do" class="tooltipa2">
+					<img class="img_icon" src="img/icons/iconfont/cenManage.png" id="icon16"></img>
+					<span id="menu18" class="top5">集中管理</span> 
+			    </a>
+			</li>
 		</ul>
+		</c:if>
 	</div>
 </div>
 
