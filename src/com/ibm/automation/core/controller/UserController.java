@@ -237,5 +237,18 @@ public class UserController {
 		return -1; 
 	}
 	public static void main(String[] args) {
+	
+
+	}
+	
+	
+	/*
+	 * 账号管理主页
+	 */
+	
+	@RequestMapping(value="/cenManage")
+	public String cenManage(HttpServletRequest request)
+	{
+		return "cenManage";
 	}
 }
