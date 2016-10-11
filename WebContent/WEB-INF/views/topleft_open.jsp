@@ -363,7 +363,7 @@ $("body").on("click","#usercenter,#usercenter2",function(){
 		</c:if>
 	</div>
 </div>
-
+	
 	<script src="js/main.js"></script>
 	<!-- Resource jQuery -->
 </html>

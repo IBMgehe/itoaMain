@@ -1,7 +1,6 @@
 package com.ibm.automation.core.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -238,8 +237,8 @@ public class UserController {
 		return -1; 
 	}
 	public static void main(String[] args) {
+	
 
-		
 	}
 	
 	

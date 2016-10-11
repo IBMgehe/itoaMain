@@ -51,7 +51,6 @@ import com.ibm.automation.core.util.UtilDateTime;
 
 import net.sf.json.JSONObject;
 
-
 @Controller
 public class JobsController {
 
@@ -73,6 +72,8 @@ public class JobsController {
 	public String getAlljobs(HttpServletRequest request, HttpSession session) {
 		List<JobsBean> ljb = ServerUtil.getJobs("/api/v1/jobs");
 		request.setAttribute("jobs", ljb);
+		request.setAttribute("proList",request.getSession().getAttribute("proList"));
+		request.setAttribute("role", request.getSession().getAttribute("role"));
 		return "healthCheck";
 	}
 
@@ -94,12 +95,12 @@ public class JobsController {
 		delete_param.put("operType", "deleteJob");
 		try {
 			String retMsg = HttpClientUtil.postMethod(strOrgUrl, delete_param.toString());
-			logger.info("deletejob::收到数据"+retMsg);
+			logger.info("deletejob::收到数据" + retMsg);
 			return retMsg;
 		} catch (NetWorkException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			logger.error("deletejob::发生异常，异常为："+e.getMessage());
+			logger.error("deletejob::发生异常，异常为：" + e.getMessage());
 		}
 		return null;
 	}
@@ -119,7 +120,7 @@ public class JobsController {
 				PropertyKeyConst.POST_ams2_healthCheck_jobs);
 		try {
 			String retMsg = HttpClientUtil.postMethod(strOrgUrl, retParam.toString());
-			logger.info("创建巡检任务,收到返回数据:"+retMsg);
+			logger.info("创建巡检任务,收到返回数据:" + retMsg);
 			ObjectNode ons = (ObjectNode) om.readTree(retMsg);
 			if (ons.get("status").asText().equalsIgnoreCase("1")) {
 				JSONObject json = new JSONObject();
@@ -150,7 +151,7 @@ public class JobsController {
 		StringBuffer finalStringOut = new StringBuffer("");
 		if (ipList.length == 1) // 表示选了组或者单个IP
 		{
-			if (!isIP(ipList[0]))   //用正则表达式判断是否为IP  ，不是IP就是全部
+			if (!isIP(ipList[0])) // 用正则表达式判断是否为IP ，不是IP就是全部
 				return "All";// 返回all的原因是ansible -i all ...
 		}
 		for (String ip : ipList) {
@@ -181,18 +182,17 @@ public class JobsController {
 
 		job.setJob_uuid(UUID.randomUUID().toString());
 		job.setJob_type(job_type);
-		//选择组
-		String	select = request.getParameter("select");
-		if(select.equalsIgnoreCase("group"))
+		// 选择组
+		String select = request.getParameter("select");
+		if (select.equalsIgnoreCase("group"))
 			job.setJob_target("All");
-			job.setJob_groupOrIP(job_type+"_Group");  //是组的话就是组名
-		if(select.equalsIgnoreCase("ip")){
-		String[] job_target = request.getParameterValues("job_target");// 被巡检的对象有可能是all
-		job.setJob_target(convertStringListToString(job_target));
-		job.setJob_groupOrIP("ip");//不是组的话是空
+		job.setJob_groupOrIP(job_type + "_Group"); // 是组的话就是组名
+		if (select.equalsIgnoreCase("ip")) {
+			String[] job_target = request.getParameterValues("job_target");// 被巡检的对象有可能是all
+			job.setJob_target(convertStringListToString(job_target));
+			job.setJob_groupOrIP("ip");// 不是组的话是空
 		}
-		
-		
+
 		job.setJob_lastrun_at("");// 上一次执行时间为空
 		job.setJob_submited_by((String) request.getSession().getAttribute("userName"));// 从session中获取当前登陆用户
 		JSONObject runType = new JSONObject();
@@ -200,7 +200,7 @@ public class JobsController {
 		JSONObject jsonObject = JSONObject.fromObject(job);
 		jsonObject.put("job_runType", runType);
 		jsonObject.put("operType", "createJob");// 是增加还是删除
-		logger.info("创建巡检任务，组装参数"+jsonObject.toString());
+		logger.info("创建巡检任务，组装参数" + jsonObject.toString());
 		return jsonObject.toString();
 	}
 
@@ -246,7 +246,7 @@ public class JobsController {
 		tempNode.put("job_uuid", uuid);
 		try {
 			String retMsg = HttpClientUtil.postMethod(strOrgUrl, tempNode.toString());
-			logger.info("获取巡检任务列表,返回数据:"+retMsg);
+			logger.info("获取巡检任务列表,返回数据:" + retMsg);
 			JsonNode retNode = om.readTree(retMsg);
 			if (retNode.get("status").asInt() == 1) {
 				return (ArrayNode) retNode.get("msg");
@@ -297,7 +297,7 @@ public class JobsController {
 				rrsb.setHealthJobsRunResult_ip(jn.get("healthJobsRunResult_ip").asText());
 				rrsb.setHealthJobsRunResult_uuid(jn.get("healthJobsRunResult_uuid").asText());
 				rrsb.setHealthJobsRunResult_result(jn.get("healthJobsRunResult_result").asInt());
-			
+
 				pieStatusList.add(jn.get("healthJobsRunResult_result").asInt());// 饼图加入状态0
 																				// 1
 																				// 2
@@ -312,8 +312,7 @@ public class JobsController {
 			request.setAttribute("jobDetail_status", retJobDetail.get("jobDetail_status").asText());
 			request.setAttribute("jobDetail_submited_by", retJobDetail.get("jobDetail_submited_by").asText());
 			request.setAttribute("jobDetail_if_daily", retJobDetail.get("jobDetail_if_daily").asText());
-			
-	
+
 			request.setAttribute("jobDetail_groupOrIP", retJobDetail.get("jobDetail_groupOrIP").asText());
 			request.setAttribute("jobDetail_target", retJobDetail.get("jobDetail_target").asText());
 			request.setAttribute("IPStatusList", lrrlsb); // 将好坏的IP都放入一个数组进行判断
@@ -333,17 +332,15 @@ public class JobsController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			final TreeSet<String> datetimOrderList = new TreeSet<String>(new StringComparator()); 
-			for(JsonNode tempJn:an)
-			{
-				String str= tempJn.get("healthJobsRunResult_datetime").asText();
+			final TreeSet<String> datetimOrderList = new TreeSet<String>(new StringComparator());
+			for (JsonNode tempJn : an) {
+				String str = tempJn.get("healthJobsRunResult_datetime").asText();
 				datetimOrderList.add(str);
-			
+
 			}
-			
-			for(JsonNode jn:an)
-			{
-				if(datetimOrderList.first().equals(jn.get("healthJobsRunResult_datetime").asText())){
+
+			for (JsonNode jn : an) {
+				if (datetimOrderList.first().equals(jn.get("healthJobsRunResult_datetime").asText())) {
 					RunResultStatusBean rrsb = new RunResultStatusBean();
 					rrsb.setHealthJobsRunResult_ip(jn.get("healthJobsRunResult_ip").asText());
 					rrsb.setHealthJobsRunResult_result(jn.get("healthJobsRunResult_result").asInt());
@@ -355,10 +352,9 @@ public class JobsController {
 				}
 			}
 			Iterator<String> iter = datetimOrderList.iterator();
-			List<String> finalList= new ArrayList<String>();
-			while(iter.hasNext())
-			{
-				String curTime=(String)iter.next();
+			List<String> finalList = new ArrayList<String>();
+			while (iter.hasNext()) {
+				String curTime = (String) iter.next();
 				finalList.add(covertDateFormat(curTime));
 			}
 			request.setAttribute("runTimeList", finalList);
@@ -429,13 +425,13 @@ public class JobsController {
 		String jobType = request.getParameter("jobType");// 是哪个任务mq\db2\was\ihs
 		ObjectNode retRunResult = amsRestService.getList_one(null, null,
 				"/api/v1/jobrunresult?healthJobsRunResult_uuid=" + healthJobsRunResult_uuid + "&curPage=summary");
-		logger.info("跳转到summary页面:"+retRunResult);
-		
+		logger.info("跳转到summary页面:" + retRunResult);
+
 		String json_os_data = retRunResult.get("msg").get("healthJobsRunResult_retJson_os").asText();
-		
+
 		JsonNode jsonOSData = null;
 		try {
-			
+
 			jsonOSData = om.readTree(json_os_data);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -450,17 +446,15 @@ public class JobsController {
 		request.setAttribute("OSTop10List", translateOSTop10ToList(jsonOSData));
 		request.setAttribute("OSSystemInfoList", translateOSSystemInfoToList(jsonOSData));
 		request.setAttribute("OSCronjobs", translateOSCronJobsToList(jsonOSData));
-		if(jobType.equalsIgnoreCase("oshc"))
-		{
+		if (jobType.equalsIgnoreCase("oshc")) {
 			return "healthCheck_OS_Summary";
 		}
 		String json_data = null;
-		try{
-		 json_data = retRunResult.get("msg").get("healthJobsRunResult_retJson").asText();
-		}catch(NullPointerException e)
-		{
+		try {
+			json_data = retRunResult.get("msg").get("healthJobsRunResult_retJson").asText();
+		} catch (NullPointerException e) {
 			e.printStackTrace();
-			logger.error("获取产品数据JSON信息出错："+e.getMessage());
+			logger.error("获取产品数据JSON信息出错：" + e.getMessage());
 		}
 		JsonNode jsonData = null;
 		try {
@@ -470,8 +464,7 @@ public class JobsController {
 			e.printStackTrace();
 			logger.error("healthCheck_summary::解析返回的产品 json出错::" + e.getMessage());
 		}
-		
-		
+
 		if (jobType.equalsIgnoreCase("mqhc")) {
 			Map<String, String> MQMap = transMQRetJsontoMap(jsonData);
 			request.setAttribute("MQMap", MQMap);
@@ -500,12 +493,12 @@ public class JobsController {
 			while (json.hasNext()) {
 				MQQMGRBean qmgrbean = new MQQMGRBean();
 				JsonNode jn = json.next();
-				qmgrbean.setQmgrName(jn.get("name").asText()==null?"":jn.get("name").asText());
-				qmgrbean.setQmgr(jn.get("qmgr").asText()==null?"":jn.get("qmgr").asText());
-				qmgrbean.setDlq(jn.get("dlq").asText()==null?"":jn.get("dlq").asText());
-				qmgrbean.setQue(jn.get("que").asText()==null?"":jn.get("que").asText());
-				qmgrbean.setChl(jn.get("chl").asText()==null?"":jn.get("chl").asText());
-				qmgrbean.setLstr(jn.get("lstr").asText()==null?"":jn.get("lstr").asText());
+				qmgrbean.setQmgrName(jn.get("name").asText() == null ? "" : jn.get("name").asText());
+				qmgrbean.setQmgr(jn.get("qmgr").asText() == null ? "" : jn.get("qmgr").asText());
+				qmgrbean.setDlq(jn.get("dlq").asText() == null ? "" : jn.get("dlq").asText());
+				qmgrbean.setQue(jn.get("que").asText() == null ? "" : jn.get("que").asText());
+				qmgrbean.setChl(jn.get("chl").asText() == null ? "" : jn.get("chl").asText());
+				qmgrbean.setLstr(jn.get("lstr").asText() == null ? "" : jn.get("lstr").asText());
 				qmgrlist.add(qmgrbean);
 			}
 		}
@@ -550,19 +543,18 @@ public class JobsController {
 	}
 
 	// 将map 中top 10 进程转成list
-	public Map<String,String> translateOSCronJobsToList(JsonNode jsonOSData) {
+	public Map<String, String> translateOSCronJobsToList(JsonNode jsonOSData) {
 		JsonNode cronjobs = jsonOSData.get("os").get("cronjobs");
 		Iterator<String> nameIter = cronjobs.fieldNames();
-		Map<String,String> mapTemp = new HashMap<String,String>();
-		while(nameIter.hasNext())
-		{
-			
+		Map<String, String> mapTemp = new HashMap<String, String>();
+		while (nameIter.hasNext()) {
+
 			String s = nameIter.next();
-			
+
 			mapTemp.put(s, cronjobs.get(s).toString());
-			
+
 		}
-		
+
 		return mapTemp;
 	}
 
@@ -844,30 +836,34 @@ public class JobsController {
 
 		return ipAddress;
 	}
+
 	/**
 	 * 这是健康检查获取IP错误信息
+	 * 
 	 * @param request
 	 * @param session
 	 * @return
 	 */
-		@RequestMapping(value = "/getIPErrMsg.do")
-		@ResponseBody
-		public ObjectNode getIPErrMsg(HttpServletRequest request, HttpSession session) {
-			String uuid = request.getParameter("healthJobsRunResult_uuid");
-			ObjectNode curPlaybook = amsRestService.getList_one(null, null, "odata/healthcheckiperrmsg?healthJobsRunResult_uuid=" + uuid);
-			String retData = curPlaybook.get("errmsg").asText();
-			ObjectNode retNode = om.createObjectNode();
-			retNode.put("errmsg", retData);
-			return retNode;
-		}
+	@RequestMapping(value = "/getIPErrMsg.do")
+	@ResponseBody
+	public ObjectNode getIPErrMsg(HttpServletRequest request, HttpSession session) {
+		String uuid = request.getParameter("healthJobsRunResult_uuid");
+		ObjectNode curPlaybook = amsRestService.getList_one(null, null,
+				"odata/healthcheckiperrmsg?healthJobsRunResult_uuid=" + uuid);
+		String retData = curPlaybook.get("errmsg").asText();
+		ObjectNode retNode = om.createObjectNode();
+		retNode.put("errmsg", retData);
+		return retNode;
+	}
 
 }
-class StringComparator implements Comparator<String>{
+
+class StringComparator implements Comparator<String> {
 
 	@Override
 	public int compare(String str1, String str2) {
-		
-		return str2.compareTo(str1);//降序;
+
+		return str2.compareTo(str1);// 降序;
 	}
-	
+
 }
