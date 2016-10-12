@@ -203,8 +203,6 @@ window.onbeforeunload = function () {
 
 //将消息显示在网页上
 function setMessageInnerHTML(retData) {
-	//uuid,1
-	
 	var dataList = retData.split(',');
 	$("#myTable tbody").find('tr').each(function(){
 		 var tdArr = $(this).children();
@@ -226,25 +224,17 @@ function setMessageInnerHTML(retData) {
 		 }
 			 
 	})
-   // document.getElementById('message').innerHTML += innerHTML + '<br/>';
 }
 
 //关闭WebSocket连接
 function closeWebSocket() {
-    websocket.close();
+	if(websocket != null)
+		{
+		websocket.close();
+		websocket =null;
+		}
+    
 }
-
-/* //发送消息
-function send() {
-    var message = document.getElementById('text').value;
-    websocket.send(message);
-} */
-
-
-
-
-
-
 </script>
 
 
