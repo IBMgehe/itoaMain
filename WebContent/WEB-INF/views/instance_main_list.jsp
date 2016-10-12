@@ -948,11 +948,7 @@ input[type="text"],input[type="password"] {
     var websocket = null;
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window) {
-<<<<<<< HEAD
-    	websocket = new WebSocket("ws://127.0.0.1/itoa/updateServerStatus"); 
-=======
-        websocket = new WebSocket("ws://127.0.0.1/itoa/updateServerStatus"); 
->>>>>>> branch 'master' of https://github.com/chenfurong/itoaMain.git
+    	websocket = new WebSocket("ws://"+window.location.host+"/itoa/updateServerStatus"); 
     }
     else {
         alert('当前浏览器 Not support websocket')
@@ -1011,7 +1007,12 @@ input[type="text"],input[type="password"] {
 
     //关闭WebSocket连接
     function closeWebSocket() {
-        websocket.close();
+    	if(websocket != null)
+    	{
+    		websocket.close();
+    		websocket = null;
+    	}
+        
     }
 </script>
 </html>
