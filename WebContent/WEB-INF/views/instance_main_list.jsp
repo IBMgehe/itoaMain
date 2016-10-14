@@ -948,7 +948,7 @@ input[type="text"],input[type="password"] {
     var websocket = null;
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window) {
-        websocket = new WebSocket("ws://192.168.80.5/itoa/updateServerStatus"); 
+    	websocket = new WebSocket("ws://"+window.location.host+"/itoa/updateServerStatus"); 
     }
     else {
         alert('当前浏览器 Not support websocket')
@@ -987,7 +987,8 @@ input[type="text"],input[type="password"] {
     		var ip=obj['msg'];
     		alert(ip+' 账号或密码不正确！');
     	}else if(obj['type']==2){//网络不通
-    		alert('网络不通！');
+    		var ip =obj['msg'];
+    		alert( ip + ' 网络不通！');
     	}else if(obj['type']==0){   //账号密码、网络正确、获取到数据
     	var dataList = obj['msg'].split(':');
     	$("#mytable tbody").find('tr').each(function(){
@@ -1006,7 +1007,12 @@ input[type="text"],input[type="password"] {
 
     //关闭WebSocket连接
     function closeWebSocket() {
-        websocket.close();
+    	if(websocket != null)
+    	{
+    		websocket.close();
+    		websocket = null;
+    	}
+        
     }
 </script>
 </html>

@@ -1,7 +1,6 @@
 package com.ibm.automation.core.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -65,15 +65,22 @@ public class UserController {
 		try {
 			String response = HttpClientUtil.postMethod(strOrgUrl, on.toString());
 			if (!response.equals("")) {
-				JSONObject jsonObj = JSONObject.fromObject(response);
-				int retVal = (Integer) jsonObj.get("status"); // 返回状态
-				String retMsg = (String) jsonObj.get("message"); // 返回描述符
+				JsonNode jn = om.readTree(response);
+			//	JSONObject jsonObj = JSONObject.fromObject(response);
+			//	int retVal = (Integer) jsonObj.get("status"); // 返回状态
+			//	String retMsg =jsonObj.get("message").toString(); // 返回描述符
+				int retVal = jn.get("status").asInt();
+				JsonNode retMsg = jn.get("message");
 				if (retVal == 1) // 登录成功
 				{
 					List<ServersBean> lahb = ServerUtil.getList("odata/servers");
 					request.setAttribute("servers", lahb);
 					request.setAttribute("total", lahb.size());
+					JsonNode innerNode = om.readTree(retMsg.asText());
+					String[] proList = innerNode.get("product").asText().toUpperCase().split(",");
 					request.getSession().setAttribute("userName", user.getUsername());
+					request.getSession().setAttribute("proList", proList);
+					request.getSession().setAttribute("role", innerNode.get("role").asInt());
 					logger.info("登录成功，正在为您跳转！");
 					return "instance_main_list";
 				} else {
@@ -230,7 +237,18 @@ public class UserController {
 		return -1; 
 	}
 	public static void main(String[] args) {
-		List<LoginBean>	list = ServerUtil.getAllUsers("/api/v1/users");
-		
+	
+
+	}
+	
+	
+	/*
+	 * 账号管理主页
+	 */
+	
+	@RequestMapping(value="/cenManage")
+	public String cenManage(HttpServletRequest request)
+	{
+		return "cenManage";
 	}
 }

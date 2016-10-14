@@ -163,87 +163,6 @@
 	</div>
 </body>
 
-<%-- <script type="text/javascript">
-	function refreshTable()
-	{
-		var uuids=[];  
-		$("#myTable tbody").find('tr').each(function(){
-			var tdArr = $(this).children();
-			 if (tdArr.eq(5).text().trim() != '失败' && tdArr.eq(5).text().trim() != '成功')
-			    {
-				 //uuid={};
-				 uuids.push(tdArr.eq(6).text().trim());
-							}
-			 if(uuids.length > 0 )  //大于0 表示存在需要更新的playbook-uuid
-			   {
-				 $.ajax({
-					   url:'<%=path%>/getPlaybookStatus.do',
-					   type:'post',
-					   dataType:'json',
-					  
-					   data:{'playbookuuids':uuids},
-					   traditional: true, //传递数组用
-					   success:function(result)
-					   {
-						 //  alert(result.msg);
-						   if(result.status == 1)  //获取到了数据
-						   {
-							  
-								   $("#myTable tbody").find('tr').each(function(){
-									   var tdArr = $(this).children();
-									   var obj = eval('(' + result['msg'] + ')'); //转为对象
-									   for ( var i = 0 ; i < obj.length;i++)
-									   {
-										   for(var k in obj[i])
-										   {
-											   if ( tdArr.eq(6).text().trim() == k){
-												   	if(obj[i][k] == 1)  //运行中
-												   	{
-												   		tdArr.eq(5).html("&nbsp;&nbsp;&nbsp;&nbsp; <img src=\"img/icons/common/icon_resized.png\"> <b>执行中</b>");
-												   	}else if (obj[i][k] == 0 )//未运行
-												   	{
-												   		tdArr.eq(5).html("&nbsp;&nbsp;&nbsp;&nbsp; <img src=\"img/icons/common/icon_paused.png\"><b>未执行</b>");
-												   	}else if (obj[i][k] == 2)//完成
-												   	{
-												   		tdArr.eq(5).html("<img src=\"img/icon_success.png\"> <b>成功</b>");
-												   	}else if (obj[i][k] == 3)//失败
-												   	{
-												   		tdArr.eq(5).html("<img src=\"img/icon_error.png\"> <b>失败</b>");
-												   	}
-												  	//tdArr.eq(5).text(obj[i][k]);
-											   }
-										   }
-										   
-									   }
-									  
-								   });
-						       
-						   }
-					   },
-					   failure:function(errmsg)
-					   {
-						   
-					   }
-					   
-				   })
-			   }
-			//alert(tdArr.text())
-			
-		})
-	}
-	
-	function refreshTable1()
-	{
-		$("#myTable tbody").find('tr').each(function(){
-			var tdArr = $(this).children();
-			 if (tdArr.eq(5).text().trim() != '失败' && tdArr.eq(5).text().trim() != '成功')
-			 {
-				 window.location.reload();  //重新加载页面
-			 }
-		});
-	}
-	//window.setInterval('refreshTable()', 3000); //每隔10秒自动刷新一次
-</script> --%>
 
 
 <script type="text/javascript">
@@ -251,8 +170,7 @@
 var websocket = null;
 //判断当前浏览器是否支持WebSocket
 if ('WebSocket' in window) {
-	
-    websocket = new WebSocket("ws://127.0.0.1/itoa/updatePlaybookStatus");
+	websocket = new WebSocket("ws://"+window.location.host+"/itoa/updatePlaybookStatus"); 
 }
 else {
     alert('当前浏览器 Not support websocket')
@@ -285,8 +203,6 @@ window.onbeforeunload = function () {
 
 //将消息显示在网页上
 function setMessageInnerHTML(retData) {
-	//uuid,1
-	
 	var dataList = retData.split(',');
 	$("#myTable tbody").find('tr').each(function(){
 		 var tdArr = $(this).children();
@@ -308,25 +224,17 @@ function setMessageInnerHTML(retData) {
 		 }
 			 
 	})
-   // document.getElementById('message').innerHTML += innerHTML + '<br/>';
 }
 
 //关闭WebSocket连接
 function closeWebSocket() {
-    websocket.close();
+	if(websocket != null)
+		{
+		websocket.close();
+		websocket =null;
+		}
+    
 }
-
-/* //发送消息
-function send() {
-    var message = document.getElementById('text').value;
-    websocket.send(message);
-} */
-
-
-
-
-
-
 </script>
 
 
