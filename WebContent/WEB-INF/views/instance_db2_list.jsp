@@ -145,7 +145,8 @@
 								{
 									  if (isConfirm) 
 									  {
-										  window.location.href = "getAllServers.do";
+										  //window.location.href = "getAllServers.do";
+										  window.location.href = "getIBMAllInstance.do?ptype=db2";
 									  } 
 								})
 					}
