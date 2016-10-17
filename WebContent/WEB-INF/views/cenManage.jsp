@@ -97,7 +97,7 @@ input[type="text"]{   /* 设置文本框的四个角的弧度 */
 						      style="height:30px;border-radius:0px;border-left:0px;border-right:0px;">
 					</div>
 					
-					<div style="float:left;height:30px;width:60px;border:1px solid #CCCCCC;" onclick="">
+					<div style="float:left;height:30px;width:60px;border:1px solid #CCCCCC;" onclick="showInfo()">
 						<img src="img/icons/iconfont/bigGlass.png" />
 					</div>
 					
@@ -105,129 +105,121 @@ input[type="text"]{   /* 设置文本框的四个角的弧度 */
 			</div>
 		</div>
 		
-		<!-- 图表 -->
-		<div style="text-align:center;">
-			<div id="main" style="height:300px;width:800px;margin:0 auto;"></div>
-		</div>
-</div>
+		<div id="picStatus" style="display:none;">
+			<div style="height:20px;width:50px;background-color:#C23531;float:left;margin-right:10px;margin-left:10%;"></div>
+			<font family="Microsoft YaHei" size="2px;">本地节点</font>
+			<div style="margin-top:5px;"></div>
+			<div style="height:20px;width:50px;background-color:#008000;float:left;margin-right:10px;margin-left:10%;"></div>
+			<font family="Microsoft YaHei" size="2px;">远程节点</font>	
+			</div>	
+		<div style="height:10px;"></div>
+	</div>
+	<!--content end-->
 
-<script>
-	function try11()
+
+
+<script>    /* 功能：根据管理节点个数动态生成图表个数 */
+	function showInfo()
 	{
+		$("#picStatus").show();
+		
+		var node_manage = 2;  //获取“管理节点”的个数
+		var line_count = Math.ceil(node_manage / 2); //计算需要的行数，若为奇数，则向上取整 
+		var node_manage_name = ["dmgr1" ,"dmgr2"/*,"dmgr3","dmgr4","dmgr5" */];//“管理节点”的名称,存在一个数组中 
+		//定义一个二维数组，存放每个 “管理节点”的子节点（按顺序）
+		var sub_node = [["app11","app12","app13","app14","app15"] ,
+		                ["app21","app22","app23"]/*,
+		                ["app31","app32","app33","app34"],
+		                ["app41","app42"],
+		                ["app51","app52","app53","app54","app55"] */];		
+
+		     
+		//根据主节点个数，在页面加载的时候动态生成n个div区域，每行2个
+		if(node_manage == 1)
+		{
+			$(".content").append("<div name='pic' id='left"+i+"' style='width:100%;height:300px;float:left;'></div>");
+		}
+		else
+		{
+			for(var i=1;i<=line_count;i++)
+			{
+				$(".content").append("<div name='pic' id='left"+i+"' style='width:50%;height:300px;float:left;'></div><div name='pic' id='right"+i+"' style='width:50%;height:300px;float:right;'></div>");
+			}
+		}
 			
+		
+		//获取所有name为pic的id
+		var obj = document.getElementsByName("pic");
+		var arr = [];
+		//判断管理节点是奇数还是偶数	
+		if(node_manage % 2 == 0)
+		{
+			for(var i =0;i<obj.length;i++)
+			{
+				arr.push(obj[i].id);   //偶数情况：arr数组存放所有pic的id 
+			}
+		}
+		else
+		{
+			for(var i =0;i<obj.length-1;i++)
+			{
+				arr.push(obj[i].id);   //奇数情况：arr数组存放所有pic的id,去掉最后一个
+			}
+		}
+		
+		
+		//开始设置关系图
+		for(var i=0;i<sub_node.length;i++)
+		{
+			var myChart = echarts.init(document.getElementById(arr[i]));
+			var dmgr = node_manage_name[i];
+			var hen = 0;//初始化一个横坐标 
+			var datas = [];
+			var linkss = [];
+			for(var j=0;j<sub_node[i].length;j++)
+			{	
+				datas.push({"name": sub_node[i][j], "x": hen, "y": 300});
+				hen+=100;
+			}
+			datas.push({"name": dmgr, "x": hen/2-50, "y": 100});
+			for(var j=0;j<sub_node[i].length;j++)
+			{
+				linkss.push({"source":dmgr,"target":sub_node[i][j]});
+			}
+			
+			//
+			
+			var option = {
+				    title: { text: '' },
+				    tooltip: {},
+				    animationDurationUpdate: 1500,
+				    animationEasingUpdate: 'quinticInOut',
+				    series : [
+				        {
+				            type: 'graph',
+				            layout: 'none',
+				            symbolSize: 50,  /* 圆的大小 */ 
+				            roam: true,
+				            label: { normal: { show: true } },
+				            edgeSymbol: ['circle', 'arrow'],
+				            edgeSymbolSize: [4, 10],  /* 关系线两端的箭头大小 */ 
+				            edgeLabel: { normal: { textStyle: { fontSize: 20 } } },
+				            data: datas,
+				            links:linkss,
+				            lineStyle: {
+				                normal: {
+				                    opacity: 0.9, /* 线条的透明度 */ 
+				                    width: 2,  /* 线条的宽度 */ 
+				                    curveness: 0  /* 直线，1，2，3....表示线的弯曲程度 */ 
+				                }
+				            }
+				        }
+				    ]
+				}; 
+				
+			myChart.setOption(option);
+		}
 	}
-</script>
-
-<script>
-var myChart = echarts.init(document.getElementById('main'));
-
-var option = {
-	    title: { text: '' },
-	    tooltip: {},
-	    animationDurationUpdate: 1500,
-	    animationEasingUpdate: 'quinticInOut',
-	    series : [
-	        {
-	            type: 'graph',
-	            layout: 'none',
-	            symbolSize: 50,  /* 圆的大小 */ 
-	            roam: true,
-	            label: {
-	                normal: {
-	                    show: true
-	                }
-	            },
-	            edgeSymbol: ['circle', 'arrow'],
-	            edgeSymbolSize: [4, 10],  /* 关系线两端的箭头大小 */ 
-	            edgeLabel: {
-	                normal: {
-	                    textStyle: {
-	                        fontSize: 20
-	                    }
-	                }
-	            },
-	            data: [{ name: '节点1', x: 300, y: 300 ,
-	            			itemStyle:{
-	            				normal:{ color:'green' }
-	            			}
-	                   }, 
-	                   { name: '节点2', x: 400, y: 300 }, 
-	                   { name: '父节点', x: 500, y: 100 },  
-	                   { name: '节点3', x: 500, y: 300 }, 
-	                   { name: '节点4', x: 600, y: 300 },
-	                   { name: '节点5', x: 700, y: 300 },
-	                   { name: '节点0', x: 200, y: 300 },
-	                   { name: '节点6', x: 800, y: 300 }],
-	            links: [
-	            /* {   子节点之间的关系 
-	                source: 0,
-	                target: 1,
-	                symbolSize: [5, 20],
-	                label: {
-	                    normal: {
-	                        show: true
-	                    }
-	                },
-	                lineStyle: {
-	                    normal: {
-	                        width: 5,
-	                        curveness: 0.2
-	                    }
-	                }
-	            },  */
-	            /* {
-	                source: '节点2',
-	                target: '节点1',
-	                label: {
-	                    normal: {
-	                        show: true
-	                    }
-	                },
-	                lineStyle: {
-	                    normal: { curveness: 0.2 }
-	                }
-	            },  */
-	            {
-	                source: '父节点',
-	                target: '节点1'	 
-	            }, 
-	            {
-	                source: '父节点',
-	                target: '节点2'
-	            },
-	            {
-	                source: '父节点',
-	                target: '节点4'
-	            },
-	            {
-	                source: '父节点',
-	                target: '节点3'
-	            },
-	            {
-	                source: '父节点',
-	                target: '节点5'
-	            },
-	            {
-	                source: '父节点',
-	                target: '节点0'
-	            },
-	            {
-	                source: '父节点',
-	                target: '节点6'
-	            }
-	            ],
-	            lineStyle: {
-	                normal: {
-	                    opacity: 0.9, /* 线条的透明度 */ 
-	                    width: 2,  /* 线条的宽度 */ 
-	                    curveness: 0  /* 直线，1，2，3....表示线的弯曲程度 */ 
-	                }
-	            }
-	        }
-	    ]
-	}; 
-	
-myChart.setOption(option);
 </script>
 
 </body>
