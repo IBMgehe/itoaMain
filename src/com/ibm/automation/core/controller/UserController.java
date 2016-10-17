@@ -114,10 +114,11 @@ public class UserController {
 	
 	@RequestMapping("/logout.do")
 	public String logout(HttpServletRequest request, HttpServletResponse resp, HttpSession session) {
-		request.getSession(true);
-		request.getSession().setAttribute("username", null);
-		request.getSession().invalidate();
+		
 		logger.info("用户::"+request.getSession().getAttribute("userName")+"退出系统。" );
+		request.getSession(true);
+		//request.getSession().setAttribute("userName", null);
+		request.getSession().invalidate();
 		return "redirect:/login.jsp";
 	}
 	
